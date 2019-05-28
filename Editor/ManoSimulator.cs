@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using ManoMotion.Example.InteractionPoints;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +14,6 @@ public class ManoSimulator : MonoBehaviour
 	static Sprite NoHand, OpenHand, ClosedHand, OpenPinch, ClosedPinch, Pointer;
 	static Sprite ClickTrigger, DropTrigger, GrabTrigger, ReleaseTrigger;
 	static Image HandIcon;
-	// TODO: Create cursor and HandIcon dynamically if they are missing
 
 	static bool clickIsInProgress;
 	static bool initialized;
@@ -22,13 +22,34 @@ public class ManoSimulator : MonoBehaviour
 		if (!initialized)
 		{
 			initialized = true;
+
 			var cursor = GameObject.Find("cursor")?.GetComponent<Image>();
+			// TODO: Create cursor dynamically if missing
 			if (cursor != null)
 				cursor.color = Color.red;
 
+			var manoCanvas = GameObject.Find("ManoMotionCanvas");
+			if (manoCanvas.GetComponent<InteractionPointsExample>() == null)
+			{
+				manoCanvas.AddComponent<InteractionPointsExample>();
+				var cursorMover = manoCanvas.GetComponent<InteractionPointsExample>();
+				cursorMover.cursor = cursor.gameObject;
+				cursorMover.cursorRectTransform = cursor.gameObject.GetComponent<RectTransform>();
+				cursorMover.currentInteractionPoint = InteractionPointsExample.InteractionPoint.Center;
+			}
+
 			HandIcon = GameObject.Find("HandIcon")?.GetComponent<Image>();
-			if (HandIcon != null)
-				HandIcon.color = Color.red;
+			if (HandIcon == null)
+			{
+				var handIconGO = Object.Instantiate(cursor, cursor.transform);
+				handIconGO.name = "HandIcon";
+				handIconGO.GetComponent<RectTransform>().anchoredPosition = new Vector2(93f, 0);
+				handIconGO.transform.localScale = Vector3.one * 4f;
+				HandIcon = handIconGO.GetComponent<Image>();
+			}
+
+			HandIcon.color = Color.red;
+
 			Debug.Log("HandIcon " + HandIcon);
 
 			handInfo.tracking_info.depth_estimation = 0.33f;
