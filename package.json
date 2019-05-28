@@ -1,7 +1,7 @@
 {
     "name": "com.sergeshack.manosimulator",
     "displayName": "Manomotion Simulator (for Lite ARCore 0.3)",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "unity": "2019.1",
     "description": "Simulate Manomotion hand input in Editor",
     "keywords": [
