@@ -4,6 +4,7 @@ The repo allows developers to simulate hand input in Manomotion terms in Unity E
 Controls:
 * Mouse coords for palm center
 * Mouse wheel for depth
+* `/` for hand side switch
 
 * LMB down for Pinch state 13 (closed)
 * LMB up then for Pinch state 0 (opened)
