@@ -14,6 +14,7 @@ public class ManoSimulator : MonoBehaviour
 	static Sprite NoHand, OpenHand, ClosedHand, OpenPinch, ClosedPinch, Pointer;
 	static Sprite ClickTrigger, DropTrigger, GrabTrigger, ReleaseTrigger;
 	static Image HandIcon;
+	static Text HandSideText;
 
 	static bool clickIsInProgress;
 	static bool initialized;
@@ -46,6 +47,16 @@ public class ManoSimulator : MonoBehaviour
 				handIconGO.GetComponent<RectTransform>().anchoredPosition = new Vector2(93f, 0);
 				handIconGO.transform.localScale = Vector3.one * 4f;
 				HandIcon = handIconGO.GetComponent<Image>();
+
+				var handSideGO = new GameObject("HandSide");
+				handSideGO.transform.parent = cursor.transform;
+				handSideGO.AddComponent<RectTransform>();
+				handSideGO.GetComponent<RectTransform>().anchoredPosition = new Vector2(115f, -70f);
+				handSideGO.GetComponent<RectTransform>().sizeDelta = new Vector2(200f, 100f);
+				HandSideText = handSideGO.AddComponent<Text>();
+				HandSideText.font = AssetDatabase.LoadAssetAtPath("Assets/Manomotion/Fonts/Ignis/Ignis et Glacies Sharp.ttf", typeof(Font)) as Font;
+				HandSideText.fontSize = 40;
+				HandSideText.color = Color.red;
 			}
 
 			HandIcon.color = Color.red;
@@ -53,6 +64,8 @@ public class ManoSimulator : MonoBehaviour
 			Debug.Log("HandIcon " + HandIcon);
 
 			handInfo.tracking_info.depth_estimation = 0.33f;
+			handInfo.gesture_info.hand_side = HandSide.Backside;
+			HandSideText.text = "Back";
 
 			NoHand = AssetDatabase.LoadAssetAtPath("Assets/Resources/ManoSimulator/NoHand.png", typeof(Sprite)) as Sprite;
 			OpenHand = AssetDatabase.LoadAssetAtPath("Assets/Resources/ManoSimulator/OpenHand.png", typeof(Sprite)) as Sprite;
@@ -67,6 +80,7 @@ public class ManoSimulator : MonoBehaviour
 			ReleaseTrigger = AssetDatabase.LoadAssetAtPath("Assets/Resources/ManoSimulator/ReleaseTrigger.png", typeof(Sprite)) as Sprite;
 		}
 		handInfo.tracking_info.palm_center = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+		handInfo.tracking_info.poi = Camera.main.ScreenToViewportPoint(Input.mousePosition);
 
 		handInfo.tracking_info.depth_estimation += Input.mouseScrollDelta.y * 0.1f;
 		handInfo.tracking_info.depth_estimation = Mathf.Clamp(handInfo.tracking_info.depth_estimation, 0f, 1f);
@@ -75,6 +89,14 @@ public class ManoSimulator : MonoBehaviour
 
 		// Clear trigger
 		handInfo.gesture_info.mano_gesture_trigger = ManoGestureTrigger.NO_GESTURE;
+
+		if (Input.GetKeyUp (KeyCode.Slash))
+		{
+			handInfo.gesture_info.hand_side = handInfo.gesture_info.hand_side == HandSide.Backside ? HandSide.Palmside : HandSide.Backside;
+
+			HandIcon.transform.localScale = new Vector3 (-HandIcon.transform.localScale.x, HandIcon.transform.localScale.y, HandIcon.transform.localScale.z);
+			HandSideText.text = handInfo.gesture_info.hand_side == HandSide.Backside ? "Back" : "Palm";
+		}
 
 		// LMB to Pinch
 		if (!clickIsInProgress && Input.GetMouseButtonDown(0))
@@ -163,10 +185,11 @@ public class ManoSimulator : MonoBehaviour
 
 	static void LogCurrentState ()
 	{
-		Debug.Log($"Palm center: {ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.palm_center} Depth: {ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.depth_estimation}\nMano class: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_class} state: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.state} trigger: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_gesture_trigger}");
+		Debug.Log($"Palm center: {ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.palm_center} Depth: {ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.depth_estimation}\nMano class: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_class} side: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.hand_side} state: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.state} trigger: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_gesture_trigger}");
 
 		if (HandIcon == null)
 			return;
+
 		switch (ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_class)
 		{
 			case ManoClass.NO_HAND:
