@@ -90,6 +90,7 @@ public class InputManager : MonoBehaviour
 
     private void Start()
     {
+        // Comment this out if you are not using ARCore plugin:
         CloneCamera.FinishedUpdatingShader += UpdateFrame;
     }
 
@@ -199,6 +200,12 @@ public class InputManager : MonoBehaviour
 
     void ResizeDeviceCamera()
     {
+#if UNITY_EDITOR
+        _mobileDeviceCamera = new WebCamTexture(currentFrame.width, currentFrame.height);
+        currentFrame.texture = new Texture2D(currentFrame.width, currentFrame.height);
+        currentFrame.pixels = new Color32[currentFrame.width * currentFrame.height];
+        return;
+#endif
         if (_mobileDeviceCamera)
         {
             _mobileDeviceCamera.width = currentFrame.width;

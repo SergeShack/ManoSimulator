@@ -15,6 +15,7 @@ public class ManoSimulator : MonoBehaviour
 	static Sprite ClickTrigger, DropTrigger, GrabTrigger, ReleaseTrigger;
 	static Image HandIcon;
 	static Text HandSideText;
+	static Sprite Cursor;
 
 	static bool clickIsInProgress;
 	static bool initialized;
@@ -24,13 +25,24 @@ public class ManoSimulator : MonoBehaviour
 		{
 			initialized = true;
 
-			var cursor = GameObject.Find("cursor")?.GetComponent<Image>();
-			// TODO: Create cursor dynamically if missing
-			if (cursor != null)
-				cursor.color = Color.red;
-
 			var manoCanvas = GameObject.Find("ManoMotionCanvas");
-			if (manoCanvas.GetComponent<InteractionPointsExample>() == null)
+
+
+            var cursor = GameObject.Find("cursor")?.GetComponent<Image>();
+            if (cursor == null)
+            {
+                var cursorObj = new GameObject("cursor", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+                cursorObj.transform.parent = manoCanvas.transform;
+                cursorObj.GetComponent<RectTransform>().sizeDelta = new Vector2(30, 30);
+                cursor = cursorObj.GetComponent<Image>();
+                Cursor = AssetDatabase.LoadAssetAtPath("Assets/Resources/ManoSimulator/Cursor.png", typeof(Sprite)) as Sprite;
+                cursor.sprite = Cursor;
+            }
+
+            cursor.color = Color.red;
+
+
+            if (manoCanvas.GetComponent<InteractionPointsExample>() == null)
 			{
 				manoCanvas.AddComponent<InteractionPointsExample>();
 				var cursorMover = manoCanvas.GetComponent<InteractionPointsExample>();
@@ -185,7 +197,7 @@ public class ManoSimulator : MonoBehaviour
 
 	static void LogCurrentState ()
 	{
-		Debug.Log($"Palm center: {ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.palm_center} Depth: {ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.depth_estimation}\nMano class: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_class} side: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.hand_side} state: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.state} trigger: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_gesture_trigger}");
+		//Debug.Log($"Palm center: {ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.palm_center} Depth: {ManomotionManager.Instance.Hand_infos[0].hand_info.tracking_info.depth_estimation}\nMano class: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_class} side: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.hand_side} state: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.state} trigger: {ManomotionManager.Instance.Hand_infos[0].hand_info.gesture_info.mano_gesture_trigger}");
 
 		if (HandIcon == null)
 			return;

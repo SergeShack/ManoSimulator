@@ -1,4 +1,4 @@
-This is a version for Manomotion Lite 0.3 + ARCore sample project.
+This is a version for Manomotion SDK Lite 0.3.
 The repo allows developers to simulate hand input in Manomotion terms in Unity Editor without deploying to device.
 
 Controls:
@@ -17,5 +17,4 @@ RMB - is the same for GRAB
 MMB - same for POINTER
 
 TODO:
-* Extract InteractionPointsExample to a separate script
-* Add a branch for Lite 0.3 (w/o ARCore)
+* Extract InteractionPointsExample changes to a separate script
